@@ -1,0 +1,102 @@
+http://www.mulesoft.org/mule-documentation
+
+Documentation for Mule ESB
+
+Getting started
+
+ESB and integration resources
+
+Basic Studio tutorial
+
+Intermediate Studio tutorial
+
+Core concepts
+
+Examples
+
+Free online training: Introduction to Mule
+
+Videos
+
+Working with Mule Studio (requires login)
+
+Mule Studio essentials
+
+Studio building blocks
+
+DataMapper tutorial
+
+DataMapper transformer reference
+
+Cloud connectors
+
+Exporting Mule Studio to Maven
+
+Deploying Mule Studio applications
+
+Developing Mule applications
+(requires login)
+
+Mule application architecture
+
+Mule expression language
+
+Available transports
+
+Using Transformers
+
+Routing message processors
+
+Configuring endpoints
+
+Error handling
+
+Deployment
+
+Testing
+
+Building connectors
+
+DevKit overview
+
+How the DevKit works
+
+Building your first cloud connector
+
+Writing Mule extensions
+
+Publishing Mule extensions
+
+Contributing Mule extensions
+
+Glossary of terms
+
+Using the Management Console
+
+Installation
+
+Quick start guide
+
+Demo: high availability clusters
+
+Managing users and roles
+
+Monitoring
+
+Alerts and notifications
+
+Application repository
+
+Automating tasks using scripts
+
+Deploying applications
+
+Reference
+
+Release notes
+
+Previous versions
+
+Glossary
+
+FAQ
