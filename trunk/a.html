@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<script>
+var gov=new Object();
+var Class = {
+  create: function() {
+    return function() {
+      this.initialize.apply(this, arguments);
+    }
+  }
+}
+Object.extend = function(destination, source) {
+  for (var property in source) {
+    destination[property] = source[property];
+  }
+  return destination;
+}
+ var $ = function(elem) {
+    if (arguments.length > 1) {
+      for (var i = 0, elems = [], length = arguments.length; i < length; i++)
+        elems.push($(arguments[i]));
+      return elems;
+    }
+    if (typeof elem == 'string') {
+      return document.getElementById(elem);
+    } else {
+      return elem;
+    }
+  };
+var period =  Class.create();
+period.prototype = {
+   initialize:function(value,time){
+    this.value = value;      
+    this.time = time;
+   }
+};
+gov.Graphic = Class.create();
+gov.Graphic.prototype={
+ initialize: function(data,elm,options){
+  this.setOptions(options);
+  this.entity=document.createElement("div");
+  this.pointBox=$(elm);
+  this.showPointGraphic(data);
+ },
+ setOptions: function(options) {
+  this.options = {
+   height:100,                 //绘图区域高度
+   maxHeight:50,              //y轴最高数值
+   barDistance:10,           //x轴坐标间距
+   topDistance:0,             //上部填充
+   bottomDistance:0,        //底部填充
+   leftDistance:10,
+   pointWidth:3,               //坐标点宽度
+   pointHeight:3,             //坐标点高度
+   pointColor:"#ff0000",     //坐标点颜色
+   lineColor:"#ffd43a",       //连接线颜色
+   valueWidth:10,            //y轴数值宽度
+   valueColor:"#000",       //y轴数值颜色
+   timeWidth:10,             //x轴数值宽度
+   timeColor:"#000",       //x轴数值颜色
+   disvalue:true,             //是否显示y轴数值
+   distime:true              //是否显示x轴数值
+  }
+  Object.extend(this.options, options || {});
+   },
+ showPointGraphic:function(data,obj)
+ {
+   var This=this;
+   var showPoints=new Array();
+   var values=new Array();
+   var times=new Array();
+   This.points=data;
+   This.count=data.value.length;
+   for(var i=0;i<This.count;i++)
+   {
+    var showPoint=document.createElement("div");
+                var spanValue=document.createElement("span");
+                var spanTime=document.createElement("span");
+    showPoint.height=This.points.value[i];
+                showPoint.value=This.points.value[i];
+                showPoint.time=This.points.time[i];
+    
+    showPoint.style.backgroundColor=this.options.pointColor;
+    showPoint.style.fontSize="0px";
+    showPoint.style.position="absolute";
+    showPoint.style.zIndex ="999";
+    showPoint.style.width=this.options.pointWidth+"px";
+    showPoint.style.height=this.options.pointHeight+"px";
+    showPoint.style.top=this.options.topDistance+"px";
+                
+    spanValue.style.position="absolute";
+    spanValue.style.width=this.options.valueWidth+"px";
+    spanValue.style.textAlign="center";
+    spanValue.style.color=this.options.valueColor;
+    spanValue.style.zIndex ="999";
+                spanTime.style.position="absolute";
+    spanTime.style.width=this.options.timeWidth+"px";
+    spanTime.style.textAlign="center";
+    spanTime.style.color=this.options.timeColor;
+    var timeHeight=15;
+    var valueHeight=21;
+    if(!this.options.disvalue) {
+     spanValue.style.display="none";
+     valueHeight=this.options.pointHeight;
+    }
+    if(!this.options.distime) {
+     spanTime.style.display="none";
+     timeHeight=0;
+    }
+    var left;
+    if(showPoints.length!=0){
+     left=parseInt(showPoints[showPoints.length-1].style.left)+parseInt(showPoints[showPoints.length-1].style.width)+this.options.barDistance;
+    }
+    else{
+     left=this.options.leftDistance;
+    }
+    
+    showPoint.style.left=left+"px";
+                spanValue.style.left=left+parseInt((this.options.pointWidth-this.options.valueWidth)/2)+"px";
+                spanTime.style.left=left+parseInt((this.options.pointWidth-this.options.timeWidth)/2)+"px";
+            
+    if(showPoint.height>this.options.maxHeight)
+    {
+     showPoint.height=this.options.maxHeight;
+    }
+    
+          spanValue.innerHTML=showPoint.value;
+    spanTime.innerHTML=showPoint.time;
+                        
+                showPoints.push(showPoint);
+                values.push(spanValue);
+                times.push(spanTime);
+    This.entity.appendChild(showPoint);
+    This.entity.appendChild(spanValue);
+    This.entity.appendChild(spanTime);
+    
+    var percentage=showPoints[i].height/this.options.maxHeight||0;
+    var pointTop=(this.options.height-this.options.topDistance-this.options.bottomDistance-timeHeight-valueHeight)*percentage;
+    showPoints[i].style.top=(this.options.height-this.options.bottomDistance-pointTop-timeHeight-this.options.pointHeight)+"px";
+                values[i].style.top=(this.options.height-this.options.bottomDistance-pointTop-timeHeight-valueHeight)+"px";
+                times[i].style.top=this.options.height-this.options.bottomDistance-timeHeight+"px";
+   }
+   var _leng=showPoints.length
+   for(var i=0;i<_leng;i++)
+   {
+    if(i>0)
+     {
+      This.drawLine(parseInt(showPoints[i-1].style.left),
+             parseInt(showPoints[i-1].style.top),
+             parseInt(showPoints[i].style.left),
+             parseInt(showPoints[i].style.top)
+             );
+     }
+   }
+   This.Constructor.call(This);
+  },
+  drawLine:function(startX,startY,endX,endY)
+  {
+   var xDirection=(endX-startX)/Math.abs(endX-startX);
+   var yDirection=(endY-startY)/Math.abs(endY-startY);
+   var xDistance=endX-startX;
+   var yDistance=endY-startY;
+   var xPercentage=1/Math.abs(endX-startX);
+   var yPercentage=1/Math.abs(endY-startY);
+   if(Math.abs(startX-endX)>=Math.abs(startY-endY))
+   {
+    var _xnum=Math.abs(xDistance)
+    for(var i=0;i<=_xnum;i++)
+    {
+     var point=document.createElement("div");
+     point.style.position="absolute";
+     point.style.backgroundColor=this.options.lineColor;
+     point.style.fontSize="0";
+     point.style.width="1px";
+     point.style.height="1px";       
+     
+     startX+=xDirection;
+     point.style.left=startX+this.options.pointWidth/2+"px";
+     startY=startY+yDistance*xPercentage;
+     point.style.top=startY+this.options.pointHeight/2+"px";
+     this.entity.appendChild(point);
+    }
+   }
+   else
+   {
+    var _ynum=Math.abs(yDistance)
+    for(var i=0;i<=_ynum;i++)
+    {
+     var point=document.createElement("div");
+     point.style.position="absolute";
+     point.style.backgroundColor=this.options.lineColor;
+     point.style.fontSize="0";
+     point.style.width="1px";
+     point.style.height="1px";       
+     
+     startY+=yDirection;
+     point.style.top=startY+this.options.pointWidth/2+"px";
+     startX=startX+xDistance*yPercentage;
+     point.style.left=startX+this.options.pointHeight/2+"px";
+     this.entity.appendChild(point);
+    }
+   }
+  },
+  Constructor:function()
+  {
+   this.entity.style.position="absolute";
+   this.pointBox.innerHTML="";
+   this.pointBox.appendChild(this.entity);
+  }
+}
+ window.onload=function(){
+
+var y = [ 2, 2, 2, 2, 2, 1, 13, 4, -59, -161, -255, -211, -169, -141, -101, -70, 19, 49, 42, 31, 84, 45, 51, 77, 67, 44, 43, 98, 76, 92, 123, 145, 118, 69, 92, 88, 100, 39, -32, -60, 7, 46, 41, -17, -77, -41, 3, -96, -275, -304, -194, -110, -176, -244, -183, -148, -165, -185, -162, -170, -199, -213, -222, -235, -279, -331, -291, -232, -268, -262, -248, -233, -243, -244, -314, -352, -312, -263, -270, -253, -293, -292, -263, -255, -230, -152, -111, -196, -195, -82, -44, -117, -202, -157, -115, -104, -122, -142, -102, -29, 16, 14, 14, 27, -19, -100, -47, 28, 95, 110, 58, 8, -33, -49, -52, 87, 166, 36, 28, 114, 64, -5, 20, 79, 104, 141, 160, 97, 104, 101, 151, 180, 213, 187, 59, 15, 107, 138, 193, 203, 210, 204, 277, 372, 337, 257, 272, 246, 240, 262, 312, 322, 261, 267, 322, 415, 428, 265, 290, 383, 508, 530, 434, 356, 369, 380, 330, 406, 454, 440, 371, 407, 428, 465, 449, 388, 382, 410, 411, 434, 478, 388, 324, 291, 264, 264, 198, 204, 209, 243, 307, 256, 176, 209, 266, 243, 110, 91, 114, 59, 114, 70, 97, 162, 174, 157, 133, 207, 292, 225, 122, 124, 89, -1, 38, 105, 62, -13, -23, -14, 0, -37, 23, 119, 63, -75, -21, 123, 140, 130, 58, 90, 150, 186, 140, 73, -7, 113, 181, 96, 124, 102, 143, 105, 139, 130, 39, -20, -79, -57, -108, -77, -41, 23, -36, -80, 12, 75, 32, -15, -38, -103, -97, -192, -264, -255, -270, -312, -353, -350, -326, -335, -364, -276, -211, -326, -275, -241, -238, -286, -279, -215, -236, -297, -257, -264, -315, -346, -352, -283, -291, -304, -342, -301, -290, -279, -343, -349, -311, -367, -439, -432, -462, -453, -453, -446, -410, -384, -393, -405, -353, -333, -369, -324, -360, -390, -398, -289, -229, -334, -267, -217, -144, -169, -143, -123, -72, -108, -149, -120, -91, -84, 32, 85, -11, -113, -103, -80, -103, -131, -150, -142, -153, -167, -114, -46, -95, -157, -170, -116, -17, -11, -42, -38, -19, -6, -10, 49, 153, 52, 29, 58, 0, -21, 41, 49, 71, 122, 166, 126, 65, 107];
+
+var len = y.length;
+var x= [];
+for(i=0;i<len;i++){
+  x.push(i%10 == 0 ? i: '-');
+}
+
+  var data1=new period(y, x);
+  new gov.Graphic(data1,"box1",{ pointColor:"#3366ff",lineColor:"#33ffff"});
+ }
+</script>
+<style type="text/css">
+body,td,th {
+ font-family: Arial, Helvetica, sans-serif;
+ font-size: 12px;
+ margin:0px;
+ padding:0px;
+}
+#box1{
+ padding:13px 0px 10px;
+ padding-left:28px;
+ width:677px;
+ height:180px;
+}
+</style></head>
+ <body>
+
+ <div id="box1"></div>
+ </body>
+</html>
